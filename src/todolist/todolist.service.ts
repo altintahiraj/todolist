@@ -27,4 +27,30 @@ export class TodolistService {
         }
     }
 
+    public async getById(id: number) {
+        try {
+            const task = await this.todoRepository.findOneBy({ id });
+            if (!task) {
+                throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            }
+            return task;
+        } catch (error) {
+            if (error instanceof HttpException) throw error;
+            throw new HttpException('We could not retrieve the task', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async deleteById(id: number) {
+        try {
+            const result = await this.todoRepository.delete(id);
+            if (result.affected === 0) {
+                throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            }
+            return { deleted: true };
+        } catch (error) {
+            if (error instanceof HttpException) throw error;
+            throw new HttpException('We could not delete the task', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
